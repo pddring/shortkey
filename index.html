@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://raw.github.com/furf/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js"></script>
+<style>
+
+#shortkey {
+	position: absolute;
+	width: 100px;
+	height: 100px;
+	background-color: rgba(100,100,100,0.5);
+	border-radius: 50px;
+	line-height:100px;
+	vertical-align:center;
+	text-align: center;
+	border-style: solid;
+	border-color: #000;
+	right: 200px;
+	top: 200px;
+}
+
+#rootkey {
+width: 50px;
+height: 50px;
+border-radius: 25px;
+background-color: rgba(0,250,0,0.5);
+position: absolute;
+top: 25px;
+left: 25px;
+transition: all 0.1s;
+}
+
+#path {
+position: absolute;
+top: 0px;
+left: 0px;
+}
+
+.children div {
+position: absolute;
+background-color: rgba(255,255,255,0.5);
+border-style: solid;
+border-color: #000;
+top: 25px;
+left: 25px;
+width: 50px;
+height: 50px;
+border-radius: 25px;
+line-height: 50px;
+vertical-align: center;
+text-align: center;
+transition: all 0.2s;
+}
+
+.children {
+display: none;
+transition: all 0.5s;
+}
+
+</style>
+</head>
+<body>
+<div id="shortkey"><div id="rootkey"></div><div class="children"></div>
+</div>
+<p id="editor">Editor</p>
+
+<script>
+var selected = undefined;
+$(function() {
+	var html = '';
+	for(var i = 0; i < 10; i++) {
+		html += '<div>' + i + '</div>';
+	}
+	$('.children').html(html);
+
+	$('.children div').mouseover(function(e) {
+		this.style.backgroundColor = "#F00";
+		selected = this;
+	}).mouseout(function(e) {
+		this.style.backgroundColor = "";
+		selected = undefined;
+	});
+
+	$('#shortkey,#rootkey').draggable({
+		start: function(e) {
+			$('.children').fadeIn();
+			var children = $('.children div');
+			var deltaAngle = Math.PI * 2 / children.length;
+			var angle = 0;
+			var r = 100;
+			children.each(function(index, value) {	
+				var e = children[index];
+				var x = r*Math.cos(angle);
+				var y = r*Math.sin(angle);
+				angle += deltaAngle;
+				
+				e.style.top = (25 + x) + "px";
+				e.style.left = (25 + y) + "px";
+				e.style.opacity = 1;
+			});
+		},
+		stop: function(e) {
+			$('#rootkey').css({'top': '25px', 'left': '25px'});
+			$('.children div').css({'top': '25px', 'left': '25px', 'opacity': 0});
+			$('.children').fadeOut();
+			if(selected) {
+				var editor = document.getElementById('editor');
+				switch(selected.id) {
+					case 'sk_1':
+						editor.innerHTML += "1";
+					break;
+					case 'sk_2':
+						editor.innerHTML += "2";
+					break;
+					default:
+						editor.innerHTML += selected.innerText;
+					break;
+				}
+			}
+		}
+	});
+});
+</script>
+</body>
+</html>
